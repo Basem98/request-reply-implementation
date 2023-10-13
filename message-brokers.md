@@ -36,7 +36,9 @@ Current Protocol: **AMQP 0-9-1**
 
 **`data`**: The data expected to be consumed by the node you want to send a message to. Note that RabbitMQ only accepts the content data as a `Buffer` instance. Our implementation of the `produce()` method does that by default by calling `new Buffer(JSON.stringify(data))` internally.
 
-**`queueName`**: The name of the target queue you want to send your message to, which is the same [***request queue***](#terminology) the node consumes data from. **`correlationId`**: The id attached to the HTTP request that was sent initially from the client-side to the producer service.
+**`queueName`**: The name of the target queue you want to send your message to, which is the same [***request queue***](#terminology) the node consumes data from.
+
+**`correlationId`**: The id attached to the HTTP request that was sent initially from the client-side to the producer service.
 
 **`waitForResponse`**: A boolean value which is the pillar of the **request-reply** pattern. If set to `true`, it means the producer would wait for a reply from the consumer, and would only return when a reply is received, or when a **timeout** is reached. Default value is `true`.
 
@@ -54,7 +56,7 @@ Let's take an example of the approach taken by one of the most popular message b
 
 ### How does RabbitMQ handle the Request-reply pattern by default?
 
-amqplib's implementation exposes a `sendToQueue()` method, which takes an `options` object as its 3rd parameter, and it accepts a `replyTo` field among others.
+Let's take the amqplib implementation for example. amqplib's implementation exposes a `sendToQueue()` method, which takes an `options` object as its 3rd parameter, and it accepts a `replyTo` field among others.
 
 That field accepts a string that represents the queue name, from which the producer expects to consume the reply.
 
@@ -69,7 +71,7 @@ Let's start!
 3. **Service B** is registered at the broker to be consuming messages from **`RequestQueueB`**
 4. For **service A** to dispatch a message to **service B**, it needs to send a message to the broker at **`RequestQueueB`**.
 
-        function getResourcesFromService(messageContent, queueName, options) {
+        function getResourcesFromServiceB(messageContent, queueName, options) {
             /**
              * Assuming you established connection using amqplib to a rabbitmq broker,  
              *  then stored it in the amqplibConnectionChannel variable used below.
@@ -116,7 +118,7 @@ Let's start!
              */
         });
 
-        function getResourcesFromService(messageContent, queueName, options = {}) {
+        function getResourcesFromServiceB(messageContent, queueName, options = {}) {
             /**
              * Assuming you established connection using amqplib to a rabbitmq broker,  
              *  then stored it in the amqplibConnectionChannel variable used below.
@@ -178,11 +180,11 @@ How to bridge the gap between those two different contexts to receive the messag
 In an event-driven environment such as Node.js, The `events` module along with promises come to the rescue!
 
 Going back to **service A**, we need to add three final things to bridge the gap.
-First, when we produce the message that came from the client we need to set an event listener on that client's request correlationId, because it's a unique identifier.
+First, when we produce the message that came from the client we need to set an event listener on that client's request `correlationId`, because it's a unique identifier.
 
-Then, to return the value received when that listener catches an event emitted with the same correlationId, we need to wrap it in a promise which we can wait on in the client's context.
+Then, to return the value received when that listener catches an event emitted with the same `correlationId`, we need to wrap it in a promise which we can wait on in the client's context.
 
-Finally, on the consumer that consumes from ReplyQueueA, we need to fire an event whenever a message arrives as a reply with the message's correlationId. That event's value would be the received reply's content. Therefore, the client handler, which was waiting on the promise returned from the `getResourcesFromService` method to resolve, will have access to the data from **service B** and can send it back to the client using `res.json`.
+Finally, on the consumer that consumes from ReplyQueueA, we need to fire an event whenever a message arrives as a reply with the message's `correlationId`. That event's value would be the received reply's content. Therefore, the client handler, which was waiting on the promise returned from the `getResourcesFromService` method to resolve, will have access to the data from **service B** and can send it back to the client using `res.json`.
 
         const EventEmitter = require("events");
         cosnt eventHandler = new EventEmitter();
@@ -232,7 +234,7 @@ Finally, on the consumer that consumes from ReplyQueueA, we need to fire an even
              */ 
             response.json(resourcesFromServiceB);
         });
+
 <!-- Talk about acknowledgements -->
 <!-- Talk about default exchange and unique reply queue -->
-<!-- Talk about correlationId event listener -->
 <!-- Talk about durable and autoDelete -->
