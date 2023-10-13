@@ -184,7 +184,7 @@ First, when we produce the message that came from the client we need to set an e
 
 Then, to return the value received when that listener catches an event emitted with the same `correlationId`, we need to wrap it in a promise which we can wait on in the client's context.
 
-Finally, on the consumer that consumes from ReplyQueueA, we need to fire an event whenever a message arrives as a reply with the message's `correlationId`. That event's value would be the received reply's content. Therefore, the client handler, which was waiting on the promise returned from the `getResourcesFromService` method to resolve, will have access to the data from **service B** and can send it back to the client using `res.json`.
+Finally, on the consumer that consumes from **ReplyQueueA**, we need to fire an event whenever a message arrives as a reply with the message's `correlationId`. That event's value would be the received reply's content. Therefore, the client handler, which was waiting on the promise returned from the `getResourcesFromService` method to resolve, will have access to the data from **service B** and can send it back to the client using `res.json`.
 
         const EventEmitter = require("events");
         cosnt eventHandler = new EventEmitter();
