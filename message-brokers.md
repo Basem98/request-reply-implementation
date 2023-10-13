@@ -19,9 +19,9 @@ Current Protocol: **AMQP 0-9-1**
 | *CorrelationId* | In distributed systems, each message between the different systems has an idempotent id which is a unique identifier created as soon as communication is initiated from the client, and it stays the same across the message's lifecycle. |
 | *Request-Reply Pattern* | A message-exchange pattern, and a protocol, where a node sends a message to another node consuming that message, and it expects a reply from that node asynchronously. It either waits indefinitely until the node responds or until a **timeout** is reached, if defined. |
 | *RPC<br>(Remote Procedure Call)* | A model used in the ***request-respond*** pattern, where the sender, or the requester, sends a message with the intent to execute a *procedure* remotely on the replier, or the receiver of the message, and expects to receive this *procedure*'s result as a response. |
-| *functionName* | A field, which is specific to our implementation, that denotes the name of the procedure the ***producer*** wants to execute remotely on ***consumer***, then receive its result as a reply. We always send it in the [`headers`](#expected-parameters) parameter in the [`produce()`](#expected-parameters) method.
+| *functionName* | A field, which is specific to our implementation, that denotes the name of the procedure the ***producer*** wants to execute remotely on ***consumer***, then receive its result as a reply. We always send it in the [`headers`](#expected-parameters) parameter in the [`produce()`](#expected-parameters) method. |
 
-| ## Implementation Components
+## Implementation Components
 
 | Class Name | Responsibilities |
 | ---------- | ---------------- |
